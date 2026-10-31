@@ -4,8 +4,10 @@ import { createClient } from '@supabase/supabase-js'
 // 그 값이 Supabase-js 가 설정하는 apikey/Authorization 헤더에 들어가서
 // 브라우저가 "Failed to execute 'set' on 'Headers'" 로 거부함.
 // 안전하게 trim 처리.
-const rawUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim()
-const rawKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.trim()
+// Vercel 환경변수에 복붙 시 token 중간에도 줄바꿈/공백이 섞여 들어가는 사례가 있음.
+// JWT 는 공백 허용 안 하므로 모든 whitespace 제거가 안전.
+const rawUrl = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.replace(/\s/g, '')
+const rawKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined)?.replace(/\s/g, '')
 
 if (!rawUrl || !rawKey) {
   throw new Error(
