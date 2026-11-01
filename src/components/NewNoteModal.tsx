@@ -54,14 +54,14 @@ export default function NewNoteModal({ open, onClose, onSubmit }: Props) {
       >
         <h2 className="text-base font-semibold text-neutral-900">쪽지 남기기</h2>
         <p className="mt-1 text-xs text-neutral-500">
-          모두에게 보여요. 익명 이름이 랜덤으로 붙어요.
+          무엇을 엮을지, 무엇을 가져올지 적어주세요. 이 쪽지는 모두에게 보여요!
         </p>
 
         <textarea
           ref={textareaRef}
           value={content}
           onChange={(e) => setContent(e.target.value.slice(0, MAX_LEN))}
-          placeholder="예: 캠프에서 뭐 가져갈까?"
+          placeholder="예: 뱅쇼 재료 바리바리 싸갈게요, 바라클라바 뜰 거예요"
           className="mt-4 h-28 w-full resize-none rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-900 outline-none focus:border-neutral-400"
         />
 
