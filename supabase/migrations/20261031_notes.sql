@@ -44,5 +44,9 @@ grant select (id, content, author_name, color, x, y, rotation, created_at)
   on public.notes to anon;
 grant insert, delete on public.notes to anon;
 
+-- service_role 은 관리자 Edge Function 이 쪽지 삭제 시 사용. RLS 는 bypass 되지만
+-- Automatically expose new tables 가 OFF 라서 테이블-레벨 grant 를 명시해야 permission denied 가 안 뜸.
+grant all on public.notes to service_role;
+
 -- Realtime publication 에 테이블 추가 (INSERT/DELETE 이벤트 브로드캐스트)
 alter publication supabase_realtime add table public.notes;
