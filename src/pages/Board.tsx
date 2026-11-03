@@ -24,7 +24,6 @@ import { useNotes } from '../hooks/useNotes'
 export default function Board() {
   const {
     notes,
-    loading,
     addNote,
     deleteNoteAsOwner,
     deleteNoteAsAdmin,
@@ -117,8 +116,6 @@ export default function Board() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes, adminMode])
 
-  const showEmptyHint = !loading && notes.length === 0
-
   if (!opened) {
     return <EnvelopeIntro onOpen={handleOpenInvitation} />
   }
@@ -134,18 +131,16 @@ export default function Board() {
 
       <FloatingAddButton onClick={() => setModalOpen(true)} />
 
-      {showEmptyHint && (
-        <div
-          className="fade-in-up pointer-events-none fixed z-10 flex items-center gap-1 rounded-full bg-neutral-900/85 px-3 py-1.5 text-[11px] font-medium text-white shadow"
-          style={{
-            bottom: 'calc(5.5rem + env(safe-area-inset-bottom))',
-            right: 'calc(1.5rem + env(safe-area-inset-right))',
-          }}
-        >
-          <span>첫 쪽지를 남겨보세요</span>
-          <span aria-hidden>↘</span>
-        </div>
-      )}
+      <div
+        className="fade-in-up pointer-events-none fixed z-10 flex items-center gap-1 rounded-full bg-neutral-900/85 px-3 py-1.5 text-[11px] font-medium text-white shadow"
+        style={{
+          bottom: 'calc(5.5rem + env(safe-area-inset-bottom))',
+          right: 'calc(1.5rem + env(safe-area-inset-right))',
+        }}
+      >
+        <span>쪽지를 남겨보세요</span>
+        <span aria-hidden>↘</span>
+      </div>
 
       <NewNoteModal
         open={modalOpen}
