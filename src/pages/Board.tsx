@@ -64,10 +64,32 @@ export default function Board() {
         await deleteNoteAsAdmin(noteId, password)
         forgetOwnership(noteId)
       } catch (err) {
-        console.error('[admin delete] failed', err)
-        clearAdminSession()
-        alert('관리자 세션이 만료됐어요. 다시 로그인해주세요.')
-        window.location.hash = '#/admin'
+        const anyErr = err as { context?: { response?: Response } }
+        const resp = anyErr?.context?.response
+        const status = resp?.status
+        let serverMsg: string | null = null
+        if (resp) {
+          try {
+            const bodyJson = await resp.clone().json()
+            serverMsg = bodyJson?.error ?? null
+          } catch {
+            /* ignore */
+          }
+        }
+        console.error('[admin delete] failed', { status, serverMsg, err })
+
+        if (status === 401) {
+          clearAdminSession()
+          alert('관리자 세션이 만료됐어요. 다시 로그인해주세요.')
+          window.location.hash = '#/admin'
+          return
+        }
+
+        alert(
+          serverMsg
+            ? `삭제 실패: ${serverMsg}`
+            : '삭제 중 오류가 발생했어요. 잠시 뒤 다시 시도해주세요.',
+        )
       }
       return
     }
