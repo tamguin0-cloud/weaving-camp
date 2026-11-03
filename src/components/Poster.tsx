@@ -41,7 +41,7 @@ export default function Poster() {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleSignupClick}
-        className="absolute flex items-center justify-center rounded-full bg-neutral-900 text-[12px] font-bold tracking-tight text-white shadow-lg transition active:scale-95"
+        className="absolute flex items-center justify-center rounded-full border border-neutral-900 bg-white text-[12px] font-bold tracking-tight text-neutral-900 shadow-lg transition active:scale-95"
         style={{
           width: BUTTON_W,
           height: BUTTON_H,
