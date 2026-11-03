@@ -4,6 +4,7 @@ import Poster from '../components/Poster'
 import StickyNote from '../components/StickyNote'
 import FloatingAddButton from '../components/FloatingAddButton'
 import NewNoteModal from '../components/NewNoteModal'
+import EnvelopeIntro from '../components/EnvelopeIntro'
 import { generateAnonName } from '../lib/anonName'
 import { pickColorKey } from '../lib/colors'
 import { pickPlacement } from '../lib/placement'
@@ -31,6 +32,11 @@ export default function Board() {
   } = useNotes()
   const [modalOpen, setModalOpen] = useState(false)
   const [adminMode] = useState<boolean>(() => checkIsAdmin())
+  const [opened, setOpened] = useState<boolean>(false)
+
+  const handleOpenInvitation = () => {
+    setOpened(true)
+  }
 
   const handleAddNote = async (content: string) => {
     const placement = pickPlacement(notes)
@@ -91,8 +97,12 @@ export default function Board() {
 
   const showEmptyHint = !loading && notes.length === 0
 
+  if (!opened) {
+    return <EnvelopeIntro onOpen={handleOpenInvitation} />
+  }
+
   return (
-    <>
+    <div className="fade-in">
       <BoardCanvas>
         <Poster />
         {stickyProps.map((p) => (
@@ -150,6 +160,6 @@ export default function Board() {
           서버 연결 오류: {error}
         </div>
       )}
-    </>
+    </div>
   )
 }
