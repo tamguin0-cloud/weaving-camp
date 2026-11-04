@@ -23,18 +23,25 @@ export default function Poster() {
 
   return (
     <>
-      <img
-        src="/poster.jpg"
-        alt="엮는 캠프 포스터"
-        className="absolute bg-white object-cover shadow-lg"
-        style={{
-          width: POSTER_W,
-          height: POSTER_H,
-          left: cx - POSTER_W / 2,
-          top: cy - POSTER_H / 2,
-        }}
-        draggable={false}
-      />
+      <picture>
+        <source srcSet="/poster.webp" type="image/webp" />
+        <img
+          src="/poster.jpg"
+          alt="엮는 캠프 포스터"
+          width={POSTER_W}
+          height={POSTER_H}
+          fetchPriority="high"
+          decoding="async"
+          className="absolute bg-white object-cover shadow-lg"
+          style={{
+            width: POSTER_W,
+            height: POSTER_H,
+            left: cx - POSTER_W / 2,
+            top: cy - POSTER_H / 2,
+          }}
+          draggable={false}
+        />
+      </picture>
 
       <a
         href={googleFormUrl || '#'}

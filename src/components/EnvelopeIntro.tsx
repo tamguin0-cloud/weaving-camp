@@ -92,18 +92,25 @@ export default function EnvelopeIntro({ onOpen }: Props) {
             />
           </svg>
 
-          <img
-            src="/poster.jpg"
-            alt="엮는 캠프 포스터"
-            className="absolute bg-white object-cover shadow-md pointer-events-none"
-            style={{
-              width: POSTER_W,
-              height: POSTER_H,
-              left: posterLocalLeft,
-              top: posterLocalTop,
-            }}
-            draggable={false}
-          />
+          <picture>
+            <source srcSet="/poster.webp" type="image/webp" />
+            <img
+              src="/poster.jpg"
+              alt="엮는 캠프 포스터"
+              width={POSTER_W}
+              height={POSTER_H}
+              fetchPriority="high"
+              decoding="async"
+              className="absolute bg-white object-cover shadow-md pointer-events-none"
+              style={{
+                width: POSTER_W,
+                height: POSTER_H,
+                left: posterLocalLeft,
+                top: posterLocalTop,
+              }}
+              draggable={false}
+            />
+          </picture>
 
           <svg
             className="absolute pointer-events-none"
