@@ -1,8 +1,11 @@
+import { forwardRef } from 'react'
+
 type Props = { onClick: () => void }
 
-export default function FloatingAddButton({ onClick }: Props) {
+const FloatingAddButton = forwardRef<HTMLButtonElement, Props>(({ onClick }, ref) => {
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       className="fixed z-10 flex h-14 w-14 items-center justify-center rounded-full bg-white text-3xl font-light text-neutral-900 shadow-lg transition active:scale-95"
@@ -15,4 +18,6 @@ export default function FloatingAddButton({ onClick }: Props) {
       +
     </button>
   )
-}
+})
+
+export default FloatingAddButton

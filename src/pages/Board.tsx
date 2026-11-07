@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import BoardCanvas from '../components/BoardCanvas'
+import { useMemo, useRef, useState } from 'react'
+import BoardCanvas, { CANVAS_W, CANVAS_H } from '../components/BoardCanvas'
 import Poster from '../components/Poster'
 import StickyNote from '../components/StickyNote'
 import FloatingAddButton from '../components/FloatingAddButton'
@@ -7,7 +7,7 @@ import NewNoteModal from '../components/NewNoteModal'
 import EnvelopeIntro from '../components/EnvelopeIntro'
 import { generateAnonName } from '../lib/anonName'
 import { pickColorKey } from '../lib/colors'
-import { pickPlacement } from '../lib/placement'
+import { pickPlacement, Rect } from '../lib/placement'
 import {
   createToken,
   rememberOwnership,
@@ -32,13 +32,30 @@ export default function Board() {
   const [modalOpen, setModalOpen] = useState(false)
   const [adminMode] = useState<boolean>(() => checkIsAdmin())
   const [opened, setOpened] = useState<boolean>(false)
+  const hintRef = useRef<HTMLDivElement>(null)
+  const addBtnRef = useRef<HTMLButtonElement>(null)
 
   const handleOpenInvitation = () => {
     setOpened(true)
   }
 
   const handleAddNote = async (content: string) => {
-    const placement = pickPlacement(notes)
+    const PAD = 6
+    const scale = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H)
+    const canvasLeft = (window.innerWidth - CANVAS_W * scale) / 2
+    const canvasTop = (window.innerHeight - CANVAS_H * scale) / 2
+    const extras: Rect[] = []
+    for (const el of [hintRef.current, addBtnRef.current]) {
+      const b = el?.getBoundingClientRect()
+      if (!b) continue
+      extras.push({
+        left: (b.left - canvasLeft) / scale - PAD,
+        top: (b.top - canvasTop) / scale - PAD,
+        right: (b.right - canvasLeft) / scale + PAD,
+        bottom: (b.bottom - canvasTop) / scale + PAD,
+      })
+    }
+    const placement = pickPlacement(notes, extras)
     const token = createToken()
     const inserted = await addNote({
       content,
@@ -129,9 +146,10 @@ export default function Board() {
         ))}
       </BoardCanvas>
 
-      <FloatingAddButton onClick={() => setModalOpen(true)} />
+      <FloatingAddButton ref={addBtnRef} onClick={() => setModalOpen(true)} />
 
       <div
+        ref={hintRef}
         className="fade-in-up pointer-events-none fixed z-10 flex items-center gap-1 rounded-full bg-neutral-900/85 px-3 py-1.5 text-[11px] font-medium text-white shadow"
         style={{
           bottom: 'calc(5.5rem + env(safe-area-inset-bottom))',
