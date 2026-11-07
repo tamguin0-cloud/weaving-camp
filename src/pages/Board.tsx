@@ -7,7 +7,14 @@ import NewNoteModal from '../components/NewNoteModal'
 import EnvelopeIntro from '../components/EnvelopeIntro'
 import { generateAnonName } from '../lib/anonName'
 import { pickColorKey } from '../lib/colors'
-import { pickPlacement, Rect } from '../lib/placement'
+import {
+  pickPlacement,
+  Rect,
+  SE_CTA_EXCLUSION,
+  STICKY_W,
+  STICKY_H,
+  rectOverlaps,
+} from '../lib/placement'
 import {
   createToken,
   rememberOwnership,
@@ -27,6 +34,7 @@ export default function Board() {
     addNote,
     deleteNoteAsOwner,
     deleteNoteAsAdmin,
+    repositionNotesAsAdmin,
     error,
   } = useNotes()
   const [modalOpen, setModalOpen] = useState(false)
@@ -121,6 +129,61 @@ export default function Board() {
     }
   }
 
+  const handleReposition = async () => {
+    const hidden = notes.filter((n) =>
+      rectOverlaps(
+        { left: n.x, top: n.y, right: n.x + STICKY_W, bottom: n.y + STICKY_H },
+        SE_CTA_EXCLUSION,
+      ),
+    )
+    if (hidden.length === 0) {
+      alert('overlay에 가려지는 쪽지가 없어요.')
+      return
+    }
+    if (!window.confirm(`${hidden.length}개 쪽지를 재배치할까요?`)) return
+    const password = getAdminPassword()
+    if (!password) return
+
+    const safe = notes.filter((n) => !hidden.includes(n))
+    const updates: Array<{ id: string; x: number; y: number }> = []
+    const newRects: Array<{ x: number; y: number }> = []
+    for (const h of hidden) {
+      const p = pickPlacement([...safe, ...newRects], [SE_CTA_EXCLUSION])
+      updates.push({ id: h.id, x: p.x, y: p.y })
+      newRects.push({ x: p.x, y: p.y })
+    }
+
+    try {
+      await repositionNotesAsAdmin(updates, password)
+    } catch (err) {
+      const anyErr = err as { context?: { response?: Response } }
+      const resp = anyErr?.context?.response
+      const status = resp?.status
+      let serverMsg: string | null = null
+      if (resp) {
+        try {
+          const bodyJson = await resp.clone().json()
+          serverMsg = bodyJson?.error ?? null
+        } catch {
+          /* ignore */
+        }
+      }
+      console.error('[admin reposition] failed', { status, serverMsg, err })
+
+      if (status === 401) {
+        clearAdminSession()
+        alert('관리자 세션이 만료됐어요. 다시 로그인해주세요.')
+        window.location.hash = '#/admin'
+        return
+      }
+      alert(
+        serverMsg
+          ? `재배치 실패: ${serverMsg}`
+          : '재배치 중 오류가 발생했어요. 잠시 뒤 다시 시도해주세요.',
+      )
+    }
+  }
+
   const stickyProps = useMemo(() => {
     return notes.map((n) => {
       const canDelete = adminMode || getMyToken(n.id) !== null
@@ -175,6 +238,12 @@ export default function Board() {
           }}
         >
           <span>관리자 모드</span>
+          <button
+            onClick={handleReposition}
+            className="rounded-full bg-white/20 px-2 py-0.5 text-[10px]"
+          >
+            overlay 비키기
+          </button>
           <button
             onClick={() => {
               clearAdminSession()

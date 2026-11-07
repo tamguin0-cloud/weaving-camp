@@ -1,6 +1,7 @@
 // 관리자 전용 Edge Function.
 // POST { password } 만 → 비밀번호 검증 (verify-only)
 // POST { password, noteId } → 비밀번호 검증 + 해당 쪽지 삭제 (service role 사용)
+// POST { password, updates: [{id, x, y}, ...] } → 쪽지들 좌표 bulk update (service role)
 
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -37,7 +38,11 @@ Deno.serve(async (req) => {
       return json({ error: 'Method not allowed' }, 405)
     }
 
-    let body: { password?: string; noteId?: string }
+    let body: {
+      password?: string
+      noteId?: string
+      updates?: Array<{ id: string; x: number; y: number }>
+    }
     try {
       body = await req.json()
     } catch {
@@ -54,8 +59,25 @@ Deno.serve(async (req) => {
       return json({ error: 'Invalid password' }, 401)
     }
 
-    // 비번만 → 검증 통과 응답
-    if (!body.noteId) {
+    // 좌표 bulk update 모드
+    if (body.updates !== undefined) {
+      if (!Array.isArray(body.updates) || body.updates.length === 0) {
+        return json({ error: 'updates must be a non-empty array' }, 400)
+      }
+      for (const u of body.updates) {
+        if (
+          !u ||
+          typeof u.id !== 'string' ||
+          typeof u.x !== 'number' ||
+          typeof u.y !== 'number'
+        ) {
+          return json({ error: 'invalid update entry', entry: u }, 400)
+        }
+      }
+    }
+
+    // 비번만 (noteId · updates 둘 다 없음) → 검증 통과 응답
+    if (!body.noteId && !body.updates) {
       return json({ ok: true })
     }
 
@@ -98,6 +120,24 @@ Deno.serve(async (req) => {
         },
       },
     })
+
+    // 좌표 reposition
+    if (body.updates) {
+      const results: Array<{ id: string; updated: number }> = []
+      for (const u of body.updates) {
+        const { error: upErr, count: upCount } = await admin
+          .from('notes')
+          .update({ x: u.x, y: u.y }, { count: 'exact' })
+          .eq('id', u.id)
+        if (upErr) {
+          console.error('[admin] reposition failed', { id: u.id, upErr })
+          return json({ error: upErr.message, failedId: u.id }, 500)
+        }
+        results.push({ id: u.id, updated: upCount ?? 0 })
+      }
+      console.log('[admin] reposition done', { count: results.length })
+      return json({ ok: true, results })
+    }
 
     const { error, data, count } = await admin
       .from('notes')

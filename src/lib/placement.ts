@@ -26,7 +26,11 @@ const COLLISION_BUFFER = 4
 
 export type Rect = { left: number; top: number; right: number; bottom: number }
 
-function overlaps(a: Rect, b: Rect, buffer = 0): boolean {
+// "가장 빡빡한 기기"(iPhone SE 375×667) 기준으로 역산한
+// 힌트 + FloatingAddButton의 캔버스 좌표 합집합. admin "재배치" 기능에서 사용.
+export const SE_CTA_EXCLUSION: Rect = { left: 195, top: 552, right: 400, bottom: 700 }
+
+export function rectOverlaps(a: Rect, b: Rect, buffer = 0): boolean {
   return !(
     a.right + buffer < b.left ||
     a.left - buffer > b.right ||
@@ -54,7 +58,7 @@ export function pickPlacement(
     const y = Math.round(minY + Math.random() * (maxY - minY))
     const rect: Rect = { left: x, top: y, right: x + STICKY_W, bottom: y + STICKY_H }
 
-    if (exclusions.some((e) => overlaps(rect, e))) return null
+    if (exclusions.some((e) => rectOverlaps(rect, e))) return null
     for (const n of existing) {
       const other: Rect = {
         left: n.x,
@@ -62,7 +66,7 @@ export function pickPlacement(
         right: n.x + STICKY_W,
         bottom: n.y + STICKY_H,
       }
-      if (overlaps(rect, other, COLLISION_BUFFER)) return null
+      if (rectOverlaps(rect, other, COLLISION_BUFFER)) return null
     }
     return { x, y, rotation: randomRotation() }
   }
@@ -77,7 +81,7 @@ export function pickPlacement(
     const x = Math.round(minX + Math.random() * (maxX - minX))
     const y = Math.round(minY + Math.random() * (maxY - minY))
     const rect: Rect = { left: x, top: y, right: x + STICKY_W, bottom: y + STICKY_H }
-    if (!exclusions.some((e) => overlaps(rect, e))) {
+    if (!exclusions.some((e) => rectOverlaps(rect, e))) {
       return { x, y, rotation: randomRotation() }
     }
   }

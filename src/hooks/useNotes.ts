@@ -130,5 +130,29 @@ export function useNotes() {
     setNotes((prev) => prev.filter((n) => n.id !== noteId))
   }
 
-  return { notes, loading, error, addNote, deleteNoteAsOwner, deleteNoteAsAdmin }
+  const repositionNotesAsAdmin = async (
+    updates: Array<{ id: string; x: number; y: number }>,
+    password: string,
+  ): Promise<void> => {
+    const { error } = await supabase.functions.invoke('admin', {
+      body: { password, updates },
+    })
+    if (error) throw error
+    setNotes((prev) =>
+      prev.map((n) => {
+        const u = updates.find((u) => u.id === n.id)
+        return u ? { ...n, x: u.x, y: u.y } : n
+      }),
+    )
+  }
+
+  return {
+    notes,
+    loading,
+    error,
+    addNote,
+    deleteNoteAsOwner,
+    deleteNoteAsAdmin,
+    repositionNotesAsAdmin,
+  }
 }
