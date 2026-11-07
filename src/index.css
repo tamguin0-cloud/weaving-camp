@@ -76,3 +76,11 @@ body {
 .fade-in {
   animation: fadeIn 320ms ease-out both;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

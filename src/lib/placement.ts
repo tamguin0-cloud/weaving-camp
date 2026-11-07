@@ -21,6 +21,12 @@ const EXCLUSION = {
   bottom: CY + POSTER_H / 2 + BUTTON_GAP + BUTTON_H + EXCLUSION_PAD,
 }
 
+// 뷰포트 고정된 "쪽지 남겨보세요" 힌트 + FloatingAddButton이 덮는
+// 캔버스 우측 하단 영역. 모바일 스케일 기준으로 역산한 보수적 범위.
+const CTA_EXCLUSION = { left: 220, top: 560, right: 400, bottom: 700 }
+
+const EXCLUSIONS = [EXCLUSION, CTA_EXCLUSION]
+
 const MARGIN = 8
 const COLLISION_BUFFER = 4
 
@@ -43,14 +49,14 @@ export function pickPlacement(existing: readonly { x: number; y: number }[]): Pl
   const minY = MARGIN
   const maxY = CANVAS_H - MARGIN - STICKY_H
 
-  const randomRotation = () => Math.random() * 10 - 5
+  const randomRotation = () => Math.random() * 16 - 8
 
   const tryOnce = (): Placement | null => {
     const x = Math.round(minX + Math.random() * (maxX - minX))
     const y = Math.round(minY + Math.random() * (maxY - minY))
     const rect: Rect = { left: x, top: y, right: x + STICKY_W, bottom: y + STICKY_H }
 
-    if (overlaps(rect, EXCLUSION)) return null
+    if (EXCLUSIONS.some((e) => overlaps(rect, e))) return null
     for (const n of existing) {
       const other: Rect = {
         left: n.x,
@@ -68,12 +74,12 @@ export function pickPlacement(existing: readonly { x: number; y: number }[]): Pl
     if (result) return result
   }
 
-  // 폴백: 포스터만 피하고 쪽지끼리는 겹치는 거 허용
+  // 폴백: 포스터·CTA 영역만 피하고 쪽지끼리는 겹치는 거 허용
   for (let i = 0; i < 60; i++) {
     const x = Math.round(minX + Math.random() * (maxX - minX))
     const y = Math.round(minY + Math.random() * (maxY - minY))
     const rect: Rect = { left: x, top: y, right: x + STICKY_W, bottom: y + STICKY_H }
-    if (!overlaps(rect, EXCLUSION)) {
+    if (!EXCLUSIONS.some((e) => overlaps(rect, e))) {
       return { x, y, rotation: randomRotation() }
     }
   }
