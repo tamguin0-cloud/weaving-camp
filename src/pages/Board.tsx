@@ -4,7 +4,9 @@ import Poster from '../components/Poster'
 import StickyNote from '../components/StickyNote'
 import FloatingAddButton from '../components/FloatingAddButton'
 import NewNoteModal from '../components/NewNoteModal'
+import NoteViewModal from '../components/NoteViewModal'
 import EnvelopeIntro from '../components/EnvelopeIntro'
+import { Note } from '../types'
 import { generateAnonName } from '../lib/anonName'
 import { pickColorKey } from '../lib/colors'
 import {
@@ -39,6 +41,7 @@ export default function Board() {
     error,
   } = useNotes()
   const [modalOpen, setModalOpen] = useState(false)
+  const [viewingNote, setViewingNote] = useState<Note | null>(null)
   const [adminMode] = useState<boolean>(() => checkIsAdmin())
   const [opened, setOpened] = useState<boolean>(() => hasLeftNote())
   const hintRef = useRef<HTMLDivElement>(null)
@@ -192,6 +195,7 @@ export default function Board() {
         note: n,
         canDelete,
         onDelete: canDelete ? () => handleDelete(n.id) : undefined,
+        onExpand: () => setViewingNote(n),
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -254,6 +258,8 @@ export default function Board() {
         onClose={() => setModalOpen(false)}
         onSubmit={handleAddNote}
       />
+
+      <NoteViewModal note={viewingNote} onClose={() => setViewingNote(null)} />
 
       {adminMode && (
         <div

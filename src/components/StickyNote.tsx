@@ -7,29 +7,21 @@ type Props = {
   note: Note
   canDelete: boolean
   onDelete?: () => void
+  onExpand?: () => void
 }
 
 const FADE_MASK = 'linear-gradient(to bottom, black 85%, transparent)'
 
-export default function StickyNote({ note, canDelete, onDelete }: Props) {
+export default function StickyNote({ note, canDelete, onDelete, onExpand }: Props) {
   const palette = STICKY_COLORS[note.color as StickyColorKey] ?? STICKY_COLORS.yellow
   const contentRef = useRef<HTMLParagraphElement>(null)
   const [overflows, setOverflows] = useState(false)
-  const [atBottom, setAtBottom] = useState(false)
 
   useEffect(() => {
     const el = contentRef.current
     if (!el) return
     setOverflows(el.scrollHeight > el.clientHeight + 1)
-    setAtBottom(false)
   }, [note.content])
-
-  const handleScroll = (e: React.UIEvent<HTMLParagraphElement>) => {
-    const el = e.currentTarget
-    setAtBottom(el.scrollTop + el.clientHeight >= el.scrollHeight - 1)
-  }
-
-  const showFade = overflows && !atBottom
 
   return (
     <div
@@ -52,25 +44,24 @@ export default function StickyNote({ note, canDelete, onDelete }: Props) {
       >
         <p
           ref={contentRef}
-          onScroll={handleScroll}
-          className="no-scrollbar flex-1 min-h-0 overflow-y-auto whitespace-pre-wrap break-words text-[10px] leading-[1.3] text-neutral-800"
+          className="flex-1 min-h-0 overflow-hidden whitespace-pre-wrap break-words text-[10px] leading-[1.3] text-neutral-800"
           style={
-            showFade
+            overflows
               ? { maskImage: FADE_MASK, WebkitMaskImage: FADE_MASK }
               : undefined
           }
         >
           {note.content}
         </p>
-        {showFade && (
-          <div
-            className="pointer-events-none absolute left-0 right-0 flex justify-center"
+        {overflows && onExpand && (
+          <button
+            type="button"
+            onClick={onExpand}
+            className="absolute left-1/2 -translate-x-1/2 rounded-full bg-neutral-800/80 px-1.5 py-[1px] text-[9px] leading-[1.2] text-white"
             style={{ bottom: 18 }}
           >
-            <span className="rounded-full bg-neutral-800/70 px-1.5 py-[1px] text-[9px] leading-[1.2] text-white">
-              더보기 ↓
-            </span>
-          </div>
+            전체보기
+          </button>
         )}
         <div className="mt-1 flex shrink-0 items-end justify-between gap-1">
           <span className="min-w-0 flex-1 break-keep text-[8px] leading-[1.15] text-neutral-600">
