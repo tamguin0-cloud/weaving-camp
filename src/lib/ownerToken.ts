@@ -57,3 +57,7 @@ export function forgetOwnership(noteId: string): void {
 export function getMyToken(noteId: string): string | null {
   return readMap()[noteId] ?? null
 }
+
+export function hasLeftNote(): boolean {
+  return Object.keys(readMap()).length > 0
+}

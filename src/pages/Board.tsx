@@ -20,6 +20,7 @@ import {
   rememberOwnership,
   forgetOwnership,
   getMyToken,
+  hasLeftNote,
 } from '../lib/ownerToken'
 import {
   getAdminPassword,
@@ -39,7 +40,7 @@ export default function Board() {
   } = useNotes()
   const [modalOpen, setModalOpen] = useState(false)
   const [adminMode] = useState<boolean>(() => checkIsAdmin())
-  const [opened, setOpened] = useState<boolean>(false)
+  const [opened, setOpened] = useState<boolean>(() => hasLeftNote())
   const hintRef = useRef<HTMLDivElement>(null)
   const addBtnRef = useRef<HTMLButtonElement>(null)
 
@@ -210,6 +211,19 @@ export default function Board() {
       </BoardCanvas>
 
       <FloatingAddButton ref={addBtnRef} onClick={() => setModalOpen(true)} />
+
+      <button
+        onClick={() => setOpened(false)}
+        className="fixed z-30 flex items-center gap-1 rounded-full bg-neutral-900/85 px-3 py-1.5 text-[11px] font-medium text-white shadow"
+        style={{
+          top: 'calc(1rem + env(safe-area-inset-top))',
+          right: 'calc(1rem + env(safe-area-inset-right))',
+        }}
+        aria-label="홈으로"
+      >
+        <span aria-hidden>←</span>
+        <span>홈</span>
+      </button>
 
       <div
         ref={hintRef}
