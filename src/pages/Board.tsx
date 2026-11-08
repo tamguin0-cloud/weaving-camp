@@ -214,7 +214,7 @@ export default function Board() {
 
       <button
         onClick={() => setOpened(false)}
-        className="fixed z-30 flex h-11 w-11 items-center justify-center rounded-full bg-neutral-900/85 text-white shadow"
+        className="fixed z-30 flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900/85 text-white shadow"
         style={{
           top: 'calc(1rem + env(safe-area-inset-top))',
           right: 'calc(1rem + env(safe-area-inset-right))',
@@ -222,8 +222,8 @@ export default function Board() {
         aria-label="홈으로"
       >
         <svg
-          width="20"
-          height="20"
+          width="16"
+          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
