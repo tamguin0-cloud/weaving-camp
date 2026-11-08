@@ -57,7 +57,7 @@ export default function StickyNote({ note, canDelete, onDelete, onExpand }: Prop
           <button
             type="button"
             onClick={onExpand}
-            className="absolute left-1/2 -translate-x-1/2 rounded-full bg-neutral-800/80 px-1.5 py-[1px] text-[9px] leading-[1.2] text-white"
+            className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-neutral-900/45 px-2 py-[1px] text-[9px] leading-[1.2] text-white"
             style={{ bottom: 18 }}
           >
             전체보기
