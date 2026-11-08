@@ -214,15 +214,27 @@ export default function Board() {
 
       <button
         onClick={() => setOpened(false)}
-        className="fixed z-30 flex items-center gap-1 rounded-full bg-neutral-900/85 px-3 py-1.5 text-[11px] font-medium text-white shadow"
+        className="fixed z-30 flex h-11 w-11 items-center justify-center rounded-full bg-neutral-900/85 text-white shadow"
         style={{
           top: 'calc(1rem + env(safe-area-inset-top))',
           right: 'calc(1rem + env(safe-area-inset-right))',
         }}
         aria-label="홈으로"
       >
-        <span aria-hidden>←</span>
-        <span>홈</span>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 11l9-8 9 8" />
+          <path d="M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
+        </svg>
       </button>
 
       <div
