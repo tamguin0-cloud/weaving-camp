@@ -42,7 +42,7 @@ export default function StickyNote({ note, canDelete, onDelete }: Props) {
       }}
     >
       <div
-        className="flex h-full w-full flex-col overflow-hidden"
+        className="relative flex h-full w-full flex-col overflow-hidden"
         style={{
           transform: `rotate(${note.rotation}deg)`,
           background: palette.bg,
@@ -62,6 +62,16 @@ export default function StickyNote({ note, canDelete, onDelete }: Props) {
         >
           {note.content}
         </p>
+        {showFade && (
+          <div
+            className="pointer-events-none absolute left-0 right-0 flex justify-center"
+            style={{ bottom: 18 }}
+          >
+            <span className="rounded-full bg-neutral-800/70 px-1.5 py-[1px] text-[9px] leading-[1.2] text-white">
+              더보기 ↓
+            </span>
+          </div>
+        )}
         <div className="mt-1 flex shrink-0 items-end justify-between gap-1">
           <span className="min-w-0 flex-1 break-keep text-[8px] leading-[1.15] text-neutral-600">
             {note.authorName}
